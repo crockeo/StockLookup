@@ -1,0 +1,3 @@
+# Ignoring cabal sandbox files
+.cabal-sandbox/
+cabal.sandbox.config
