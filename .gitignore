@@ -1,3 +1,7 @@
-# Ignoring cabal sandbox files
+# Ignoring miku's log files
+log/
+
+# Ignoring unwanted cabal files
 .cabal-sandbox/
 cabal.sandbox.config
+dist/
