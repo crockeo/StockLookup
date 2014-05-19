@@ -24,8 +24,8 @@ executable StockLookup
                      , hack2-handler-snap-server
                      , hack2-contrib
                      , bytestring
+                     , monads-tf
                      , parsec
                      , miku
-                     , air
   -- hs-source-dirs:      
   default-language:    Haskell2010
