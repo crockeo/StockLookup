@@ -22,8 +22,10 @@ executable StockLookup
   -- other-extensions:    
   build-depends:       base > 4 && <= 99
                      , hack2-handler-snap-server
+                     , hack2-contrib
                      , bytestring
                      , parsec
                      , miku
+                     , air
   -- hs-source-dirs:      
   default-language:    Haskell2010

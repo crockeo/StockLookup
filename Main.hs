@@ -3,25 +3,21 @@
 module Main where
 
 import Hack2.Handler.SnapServer
-import Data.ByteString.Char8 (unpack, pack)
-import Network.Miku.Type
+
+import Network.Miku.Engine
+import Network.Miku.Utils
 import Network.Miku
+
+import Control.Monad
+
+import Air.Env hiding ((.))
 
 import Templater
 
--- Serving the index page
-serveIndexIO :: IO MikuMonad
-serveIndexIO =
-  (bsPage [("pageName", "index")] "templates/index.html") >>= return . get "/" . html
-
 main :: IO ()
-main = do
-  -- Recieving the routes
-  serveIndex <- serveIndexIO
-
-  index <- bsPage [("pageName", "index")] "templates/index.html"
-
+main =
   run . miku $ do
-    public (Just ".") ["/css/", "/js/"]
+    public (Just ".") ["/*.hs", "/css/", "/js/"]
 
-    serveIndex
+    -- The index page
+    get "/" $ html =<< io (bsPage [("pageName", "index")] "templates/index.html")
