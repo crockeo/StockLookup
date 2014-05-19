@@ -1,6 +1,7 @@
 module Templater where
 
 import Text.ParserCombinators.Parsec
+import Data.ByteString.Char8 (ByteString, pack)
 
 -- Searching for a valid variable name
 varName :: Parser String
@@ -42,19 +43,25 @@ replace ps html =
     Right val -> val
 
 -- Loading an HTML file
-loadHTML :: [(String, String)] -> FilePath -> IO String
-loadHTML ps fp =
+pageRaw :: [(String, String)] -> FilePath -> IO String
+pageRaw ps fp =
   readFile fp >>= return . replace ps
 
 -- Loading an HTML file with the
 -- header and footer added
-loadHTMLTemplate :: [(String, String)] -> FilePath -> IO String
-loadHTMLTemplate ps fp = do
-  header <- loadHTML ps "templates/header.html"
-  page <- loadHTML ps fp
-  footer <- loadHTML ps "templates/footer.html"
+page :: [(String, String)] -> FilePath -> IO String
+page ps fp = do
+  header <- pageRaw ps "templates/header.html"
+  page   <- pageRaw ps fp
+  footer <- pageRaw ps "templates/footer.html"
 
   return $ header ++ (fixIndentation page) ++ footer
   where fixIndentation :: String -> String
         fixIndentation s =
           unlines $ map (\l -> "\t\t" ++ l) $ lines s
+
+-- Packing the page function into
+-- a ByteString
+bsPage :: [(String, String)] -> FilePath -> IO ByteString
+bsPage fs fp =
+  page fs fp >>= return . pack
