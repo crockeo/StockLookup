@@ -1,15 +1,22 @@
 body {
 	margin:0px;
-	padding:2%;
+	padding:10%;
 	font-family:Arial;
 	color:#333;
 	background:#fefefe;
 	text-align:center;
 }
 
+hr {
+	border-style:none;
+	height:2px;
+	background:#333;
+	width:35%;
+}
+
 /* Font Sizes */
-.massiveText { font-size:128px; }
-.largeText   { font-size: 64px; }
-.normalText  { font-size: 32px; }
-.smallText   { font-size: 16px; }
-.tinyText    { font-size:  8px; }
+.massiveText { font-size:128px; margin:5px; }
+.largeText   { font-size: 64px; margin:4px; }
+.normalText  { font-size: 32px; margin:3px; }
+.smallText   { font-size: 16px; margin:2px; }
+.tinyText    { font-size:  8px; margin:1px; }
