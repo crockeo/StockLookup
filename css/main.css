@@ -4,4 +4,12 @@ body {
 	font-family:Arial;
 	color:#333;
 	background:#fefefe;
+	text-align:center;
 }
+
+/* Font Sizes */
+.massiveText { font-size:128px; }
+.largeText   { font-size: 64px; }
+.normalText  { font-size: 32px; }
+.smallText   { font-size: 16px; }
+.tinyText    { font-size:  8px; }
