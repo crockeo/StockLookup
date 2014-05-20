@@ -24,6 +24,11 @@ serveIndex :: MikuMonad
 serveIndex =
   get "/" $ html =<< liftIO $ simpleBsPage "index"
 
+-- Serving the information page
+serveInformation :: MikuMonad
+serveInformation =
+  get "/" $ html =<< liftIO $ simpleBsPage "information"
+
 -- Serving the stock page
 serveStock :: MikuMonad
 serveStock =
