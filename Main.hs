@@ -2,65 +2,57 @@
 
 module Main where
 
-import Hack2.Handler.SnapServer
-import Hack2.Contrib.Response
-import Hack2.Contrib.Request
-
-import Control.Monad.Reader
+import Network.Wai.Middleware.Static
 import Control.Monad.Trans
-import Control.Monad
-
-import Network.Miku.Engine
-import Network.Miku.Utils
-import Network.Miku.Type
-import Network.Miku
-
-import Data.Char
+import Data.Text.Lazy
+import Data.Monoid
+import Web.Scotty
 
 import Templater
 import Data
 
+-- Static files
+staticFiles :: ScottyM ()
+staticFiles = do
+  middleware $ staticPolicy (noDots >-> addBase "static")
+
 -- Serving the index page
-serveIndex :: MikuMonad
+serveIndex :: ScottyM ()
 serveIndex =
-  get "/" $ html =<< liftIO (simpleBsPage "index")
+  get "/" $
+    html =<< liftIO (simpleTextPage "index")
 
 -- Serving the information page
-serveInformation :: MikuMonad
+serveInformation :: ScottyM ()
 serveInformation =
-  get "/information" $ html =<< liftIO (simpleBsPage "information")
+  get "/information" $
+    html =<< liftIO (simpleTextPage "information")
 
--- Serving the stock page
-serveStock :: MikuMonad
+-- Serving a stock page
+serveStock :: ScottyM ()
 serveStock =
   get "/stock" $ do
-    env <- ask
+    tScode <- param "scode"
 
-    case lookup "scode" $ params env of
-      Nothing  -> serveNoStock
-      Just (c) ->
-        if c == ""
-          then serveNoStock
-          else serveStock $ map (toUpper) $ unbs c
-  where serveNoStock   = html =<< liftIO (bsPage [("pageName", "stock")              ] "templates/nostock.html")
-        serveStock   c = html =<< liftIO (do
-          html <- codeToHTML c
+    let scode = unpack tScode in
+      if scode == ""
+        then html =<< liftIO (simpleTextPage "nostock")
+        else html =<< liftIO (do
+          rendered <- codeToHTML scode
 
-          (bsPage [("pageName", "stock"), ("scode", c), ("renderedCSV", html)] "templates/stock.html"  ))
+          textPage [("pageName", "stock"), ("scode", scode), ("renderedCSV", rendered)] "templates/stock.html")
 
--- Serving the 404 page
-serve404 :: MikuMonad
+-- Serving a 404 page
+serve404 :: ScottyM ()
 serve404 =
-  get "*" $ html =<< liftIO (simpleBsPage "404")
+  notFound $ do
+    html =<< liftIO (simpleTextPage "404")
 
 main :: IO ()
-main =
-  run . miku $ do
-    -- Setting up the static files
-    public (Just ".") ["/css/", "/js/"]
-
-    -- Setting up the routes
-    serveIndex
-    serveInformation
-    serveStock
-    serve404
+main = scotty 80 $ do
+  -- Loading the routes
+  staticFiles
+  serveIndex
+  serveInformation
+  serveStock
+  serve404

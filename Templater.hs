@@ -1,15 +1,7 @@
 module Templater where
 
 import Text.ParserCombinators.Parsec
-import Data.ByteString.Char8 (ByteString, unpack, pack)
-
--- Packing a ByteString
-bs :: String -> ByteString
-bs = pack
-
--- Unpacking a ByteString
-unbs :: ByteString -> String
-unbs = unpack
+import Data.Text.Lazy (Text, unpack, pack)
 
 -- Searching for a valid variable name
 varName :: Parser String
@@ -70,11 +62,11 @@ page ps fp = do
 
 -- Packing the page function into
 -- a ByteString
-bsPage :: [(String, String)] -> FilePath -> IO ByteString
-bsPage fs fp =
-  page fs fp >>= return . bs
+textPage :: [(String, String)] -> FilePath -> IO Text
+textPage fs fp =
+  page fs fp >>= return . pack
 
 -- Simply loading a bsPage
-simpleBsPage :: String -> IO ByteString
-simpleBsPage name =
-  bsPage [("pageName", name)] $ "templates/" ++ name ++ ".html"
+simpleTextPage :: String -> IO Text
+simpleTextPage name =
+  textPage [("pageName", name)] $ "templates/" ++ name ++ ".html"

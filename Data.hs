@@ -10,7 +10,7 @@ maxCSVLength = 10
 -- Opening a given URL
 openURL :: FilePath -> IO String
 openURL path =
-  simpleHTTP (getRequest path) >>= getResponseBody
+  (simpleHTTP (getRequest path) >>= getResponseBody) >>= (return . unlines . take maxCSVLength . lines)
 
 -- Converting a URL to parsed CSV
 parseURL :: FilePath -> IO CSV
