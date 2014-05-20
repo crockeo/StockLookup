@@ -28,7 +28,7 @@ serveIndex =
 -- Serving the information page
 serveInformation :: MikuMonad
 serveInformation =
-  get "/" $ html =<< liftIO (simpleBsPage "information")
+  get "/information" $ html =<< liftIO (simpleBsPage "information")
 
 -- Serving the stock page
 serveStock :: MikuMonad
@@ -61,5 +61,6 @@ main =
 
     -- Setting up the routes
     serveIndex
+    serveInformation
     serveStock
     serve404
