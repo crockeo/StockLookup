@@ -13,11 +13,11 @@ _line :: Parser [String]
 _line = sepBy _cell (char ',')
 
 -- The whole csv file
-csvParser :: Parser [[String]]
+csvParser :: Parser CSV
 csvParser = sepBy _line (oneOf "\n\r")
 
 -- Parsing out the csv
-csv :: String -> [[String]]
+csv :: String -> CSV
 csv s =
   case parse csvParser "csv" s of
     Left  err -> [[show err]]
