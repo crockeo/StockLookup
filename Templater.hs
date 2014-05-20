@@ -73,3 +73,8 @@ page ps fp = do
 bsPage :: [(String, String)] -> FilePath -> IO ByteString
 bsPage fs fp =
   page fs fp >>= return . bs
+
+-- Simply loading a bsPage
+simpleBsPage :: String -> IO ByteString
+simpleBsPage name =
+  bsPage [("pageName", name)] $ "templates/" ++ name ++ ".html"
