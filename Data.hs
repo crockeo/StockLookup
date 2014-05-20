@@ -27,5 +27,12 @@ constructHTML csv =
   "<table>\n" ++ constructHTMLRaw csv ++ "</table>"
   where constructHTMLRaw :: CSV -> String
         constructHTMLRaw []           = ""
-        constructHTMLRaw ((x:[]):xss) = "\t<td>" ++ x ++ "</td>\n</tr>\n<tr>\n" ++ constructHTMLRaw xss
-        constructHTMLRaw ((x:xs):xss) = "\t<td>" ++ x ++ "</td>\n" ++ constructHTMLRaw (xs:xss)
+        constructHTMLRaw ((x:[]):[] ) = "\t<td>" ++ x ++ "</td>\n</tr>\n"
+        constructHTMLRaw ((x:[]):xss) = "\t<td>" ++ x ++ "</td>\n</tr>\n<tr>\n" ++ constructHTMLRaw     xss
+        constructHTMLRaw ((x:xs):xss) = "\t<td>" ++ x ++ "</td>\n"              ++ constructHTMLRaw (xs:xss)
+
+-- Converting a stock code into displayable HTML
+codeToHTML :: String -> IO String
+codeToHTML s = do
+  csv <- parseCode s
+  return $ constructHTML csv
