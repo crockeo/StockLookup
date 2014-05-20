@@ -3,6 +3,10 @@ module Data where
 import Network.HTTP
 import CSV
 
+-- The maximum CSV length to display
+maxCSVLength :: Int
+maxCSVLength = 10
+
 -- Opening a given URL
 openURL :: FilePath -> IO String
 openURL path =
@@ -22,10 +26,16 @@ parseCode :: String -> IO CSV
 parseCode code = parseURL $ urlPrefix ++ code
 
 -- Constructing a piece of HTML from the parseCode
-constructHTML :: CSV -> String
-constructHTML csv =
+constructHTML :: CSV -> Int -> String
+constructHTML ucsv cutoff =
   "<table>\n" ++ constructHTMLRaw csv ++ "</table>"
-  where constructHTMLRaw :: CSV -> String
+  where csv :: CSV
+        csv =
+          if length ucsv > cutoff
+            then take cutoff ucsv
+            else             ucsv
+
+        constructHTMLRaw :: CSV -> String
         constructHTMLRaw []           = ""
         constructHTMLRaw ((x:[]):[] ) = "\t<td>" ++ x ++ "</td>\n</tr>\n"
         constructHTMLRaw ((x:[]):xss) = "\t<td>" ++ x ++ "</td>\n</tr>\n<tr>\n" ++ constructHTMLRaw     xss
@@ -35,4 +45,4 @@ constructHTML csv =
 codeToHTML :: String -> IO String
 codeToHTML s = do
   csv <- parseCode s
-  return $ constructHTML csv
+  return $ constructHTML csv maxCSVLength
