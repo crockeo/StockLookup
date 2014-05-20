@@ -15,12 +15,9 @@ import Network.Miku.Utils
 import Network.Miku.Type
 import Network.Miku
 
-import Debug.Trace
+import Data.Char
 
 import Templater
-
-_parameter env name =
-  lookup name $ params env
 
 -- Serving the index page
 serveIndex :: MikuMonad
@@ -38,9 +35,9 @@ serveStock =
       Just (c) ->
         if c == ""
           then serveNoStock
-          else serveStock c
-  where serveNoStock   = html =<< liftIO (bsPage [("pageName", "stock")                   ] "templates/nostock.html")
-        serveStock   c = html =<< liftIO (bsPage [("pageName", "stock"), ("scode", unbs c)] "templates/stock.html"  )
+          else serveStock $ map (toUpper) $ unbs c
+  where serveNoStock   = html =<< liftIO (bsPage [("pageName", "stock")              ] "templates/nostock.html")
+        serveStock   c = html =<< liftIO (bsPage [("pageName", "stock"), ("scode", c)] "templates/stock.html"  )
 
 -- Serving the 404 page
 serve404 :: MikuMonad
