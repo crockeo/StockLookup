@@ -22,7 +22,7 @@ import Templater
 -- Serving the index page
 serveIndex :: MikuMonad
 serveIndex =
-  get "/" $ html =<< liftIO (bsPage [("pageName", "index")] "templates/index.html")
+  get "/" $ html =<< liftIO $ simpleBsPage "index"
 
 -- Serving the stock page
 serveStock :: MikuMonad
@@ -42,7 +42,7 @@ serveStock =
 -- Serving the 404 page
 serve404 :: MikuMonad
 serve404 =
-  get "*" $ html =<< liftIO (bsPage [("pageName", "404")] "templates/404.html")
+  get "*" $ html =<< liftIO $ simpleBsPage "404"
 
 main :: IO ()
 main =
