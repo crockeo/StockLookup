@@ -10,32 +10,26 @@ maxCSVLength = 10
 -- Opening a given URL
 openURL :: FilePath -> IO String
 openURL path =
-  (simpleHTTP (getRequest path) >>= getResponseBody) >>= (return . unlines . take maxCSVLength . lines)
+  simpleHTTP (getRequest path) >>= getResponseBody
 
 -- Converting a URL to parsed CSV
-parseURL :: FilePath -> IO CSV
-parseURL path =
-  openURL path >>= return . csv
+parseURL :: Int -> FilePath -> IO CSV
+parseURL l path =
+  openURL path >>= return . csv l
 
 -- The URL prefix
 urlPrefix :: FilePath
 urlPrefix = "http://ichart.finance.yahoo.com/table.csv?s="
 
 -- Converting a stock code into parsed CSV
-parseCode :: String -> IO CSV
-parseCode code = parseURL $ urlPrefix ++ code
+parseCode :: Int -> String -> IO CSV
+parseCode l code = parseURL l $ urlPrefix ++ code
 
 -- Constructing a piece of HTML from the parseCode
-constructHTML :: CSV -> Int -> String
-constructHTML ucsv cutoff =
-  "<table>\n" ++ constructHTMLRaw csv ++ "</table>"
-  where csv :: CSV
-        csv =
-          if length ucsv > cutoff
-            then take cutoff ucsv
-            else             ucsv
-
-        constructHTMLRaw :: CSV -> String
+constructHTML :: CSV -> String
+constructHTML csv =
+  "<table>\n<tr>\n" ++ constructHTMLRaw csv ++ "</table>"
+  where constructHTMLRaw :: CSV -> String
         constructHTMLRaw []           = ""
         constructHTMLRaw ((x:[]):[] ) = "\t<td>" ++ x ++ "</td>\n</tr>\n"
         constructHTMLRaw ((x:[]):xss) = "\t<td>" ++ x ++ "</td>\n</tr>\n<tr>\n" ++ constructHTMLRaw     xss
@@ -43,6 +37,5 @@ constructHTML ucsv cutoff =
 
 -- Converting a stock code into displayable HTML
 codeToHTML :: String -> IO String
-codeToHTML s = do
-  csv <- parseCode s
-  return $ constructHTML csv maxCSVLength
+codeToHTML s =
+  parseCode maxCSVLength s >>= return . constructHTML

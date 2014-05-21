@@ -2,6 +2,8 @@ module CSV where
 
 import Text.ParserCombinators.Parsec
 
+import Debug.Trace
+
 type CSV = [[String]]
 
 -- A single cell
@@ -17,8 +19,10 @@ csvParser :: Parser CSV
 csvParser = sepBy _line (oneOf "\n\r")
 
 -- Parsing out the csv
-csv :: String -> CSV
-csv s =
-  case parse csvParser "csv" s of
+csv :: Int -> String -> CSV
+csv l s =
+  case parse csvParser "csv" fs of
     Left  err -> [[show err]]
     Right val -> val
+  where fs :: String
+        fs = init $ unlines $ take l $ lines s
