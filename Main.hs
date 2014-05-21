@@ -36,7 +36,7 @@ serveStock =
 
     let scode = unpack tScode in
       if scode == ""
-        then html =<< liftIO (simpleTextPage "nostock")
+        then html =<< liftIO (textPage [("pageName", "stock"), ("scode", scode)] "templates/nostock.html")
         else html =<< liftIO (do
           rendered <- codeToHTML scode
 
