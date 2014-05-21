@@ -2,8 +2,6 @@ module CSV where
 
 import Text.ParserCombinators.Parsec
 
-import Debug.Trace
-
 type CSV = [[String]]
 
 -- A single cell
