@@ -32,7 +32,7 @@ serveInformation =
 serveStock :: ScottyM ()
 serveStock =
   get "/stock" $ do
-    tScode <- param "scode"
+    tScode <- param "scode" `rescue` (\x -> redirect "/stock?scode=")
 
     let scode = unpack tScode in
       if scode == ""
