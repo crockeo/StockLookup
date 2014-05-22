@@ -7,7 +7,7 @@ import Data.Text.Lazy (Text, unpack, pack)
 varName :: Parser String
 varName = do
   fc <- lower
-  ns <- many $ (alphaNum <|> oneOf "_-")
+  ns <- many (alphaNum <|> oneOf "_-")
 
   return $ fc : ns
 
@@ -45,7 +45,7 @@ replace ps html =
 -- Loading an HTML file
 pageRaw :: [(String, String)] -> FilePath -> IO String
 pageRaw ps fp =
-  readFile fp >>= return . replace ps
+  liftM (replace ps) $ readFile fp
 
 -- Loading an HTML file with the
 -- header and footer added
@@ -55,7 +55,7 @@ page ps fp = do
   page   <- pageRaw ps fp
   footer <- pageRaw ps "templates/footer.html"
 
-  return $ header ++ (fixIndentation page) ++ footer
+  return $ header ++ fixIndentation page ++ footer
   where fixIndentation :: String -> String
         fixIndentation s =
           unlines $ map (\l -> "\t\t\t" ++ l) $ lines s
@@ -64,7 +64,7 @@ page ps fp = do
 -- a ByteString
 textPage :: [(String, String)] -> FilePath -> IO Text
 textPage fs fp =
-  page fs fp >>= return . pack
+  liftM pack $ page fs fp
 
 -- Simply loading a bsPage
 simpleTextPage :: String -> IO Text

@@ -16,7 +16,7 @@ urlPrefix = "http://ichart.finance.yahoo.com/table.csv?s="
 -- from the response body
 constructHTML :: String -> String
 constructHTML body =
-  "<table class=\"table table-bordered table-striped\">\n<tr>\n" ++ (constructHTMLRaw headCell $ take 1 csved) ++ (constructHTMLRaw cell $ tail csved) ++ "</table>"
+  "<table class=\"table table-bordered table-striped\">\n<tr>\n" ++ constructHTMLRaw headCell $ take 1 csved ++ constructHTMLRaw cell $ tail csved ++ "</table>"
   where csved :: CSV
         csved = csv csvLength body
 
