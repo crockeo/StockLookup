@@ -1,41 +1,42 @@
 module Data where
 
+import Network.HTTP.Base
 import Network.HTTP
 import CSV
 
--- The maximum CSV length to display
-maxCSVLength :: Int
-maxCSVLength = 10
+-- The maximum information to be converted
+csvLength :: Int
+csvLength = 10
 
--- Opening a given URL
-openURL :: FilePath -> IO String
-openURL path =
-  simpleHTTP (getRequest path) >>= getResponseBody
-
--- Converting a URL to parsed CSV
-parseURL :: Int -> FilePath -> IO CSV
-parseURL l path =
-  openURL path >>= return . csv l
-
--- The URL prefix
+-- The prefix for every CSV table
 urlPrefix :: FilePath
 urlPrefix = "http://ichart.finance.yahoo.com/table.csv?s="
 
--- Converting a stock code into parsed CSV
-parseCode :: Int -> String -> IO CSV
-parseCode l code = parseURL l $ urlPrefix ++ code
-
--- Constructing a piece of HTML from the parseCode
-constructHTML :: CSV -> String
-constructHTML csv =
-  "<table>\n<tr>\n" ++ constructHTMLRaw csv ++ "</table>"
+-- Constructing an HTML page
+-- from the response body
+constructHTML :: String -> String
+constructHTML body =
+  "<table>\n<tr>\n" ++ (constructHTMLRaw $ csv csvLength body) ++ "</table>"
   where constructHTMLRaw :: CSV -> String
         constructHTMLRaw []           = ""
         constructHTMLRaw ((x:[]):[] ) = "\t<td>" ++ x ++ "</td>\n</tr>\n"
         constructHTMLRaw ((x:[]):xss) = "\t<td>" ++ x ++ "</td>\n</tr>\n<tr>\n" ++ constructHTMLRaw     xss
         constructHTMLRaw ((x:xs):xss) = "\t<td>" ++ x ++ "</td>\n"              ++ constructHTMLRaw (xs:xss)
 
--- Converting a stock code into displayable HTML
-codeToHTML :: String -> IO String
-codeToHTML s =
-  parseCode maxCSVLength s >>= return . constructHTML
+-- Getting the response body and code
+-- for a given url
+openURL :: FilePath -> IO (String, Int)
+openURL path = do
+  res <- simpleHTTP $ getRequest path
+
+  case res of
+    Left  err -> return ("", 400)
+    Right val -> return (rspBody val, join $ rspCode val)
+  where join :: (Int, Int, Int) -> Int
+        join (a, b, c) = a * 100 + b * 10 + c
+
+-- Getting the response body and code
+-- for a given stock code
+openCode :: String -> IO (String, Int)
+openCode code =
+  openURL (urlPrefix ++ code)

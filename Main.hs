@@ -10,10 +10,11 @@ import Web.Scotty
 
 import Templater
 import Data
+import CSV
 
 -- Static files
 staticFiles :: ScottyM ()
-staticFiles = do
+staticFiles =
   middleware $ staticPolicy (noDots >-> addBase "static")
 
 -- Serving the index page
@@ -35,17 +36,17 @@ serveStock =
     tScode <- param "scode" `rescue` (\x -> redirect "/stock?scode=")
 
     let scode = unpack tScode in
-      if scode == ""
-        then html =<< liftIO (textPage [("pageName", "stock"), ("scode", scode)] "templates/nostock.html")
-        else html =<< liftIO (do
-          rendered <- codeToHTML scode
+      html =<< liftIO (do
+        (b, c) <- openCode scode
 
-          textPage [("pageName", "stock"), ("scode", scode), ("renderedCSV", rendered)] "templates/stock.html")
+        if c == 404
+          then textPage [("pageName", "stock"), ("scode", scode)]                                   "templates/nostock.html"
+          else textPage [("pageName", "stock"), ("scode", scode), ("renderedCSV", constructHTML b)] "templates/stock.html")
 
 -- Serving a 404 page
 serve404 :: ScottyM ()
 serve404 =
-  notFound $ do
+  notFound $
     html =<< liftIO (simpleTextPage "404")
 
 main :: IO ()
