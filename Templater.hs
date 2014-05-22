@@ -2,6 +2,7 @@ module Templater where
 
 import Text.ParserCombinators.Parsec
 import Data.Text.Lazy (Text, unpack, pack)
+import Control.Monad
 
 -- Searching for a valid variable name
 varName :: Parser String
