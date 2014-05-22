@@ -16,12 +16,20 @@ urlPrefix = "http://ichart.finance.yahoo.com/table.csv?s="
 -- from the response body
 constructHTML :: String -> String
 constructHTML body =
-  "<table>\n<tr>\n" ++ (constructHTMLRaw $ csv csvLength body) ++ "</table>"
-  where constructHTMLRaw :: CSV -> String
-        constructHTMLRaw []           = ""
-        constructHTMLRaw ((x:[]):[] ) = "\t<td>" ++ x ++ "</td>\n</tr>\n"
-        constructHTMLRaw ((x:[]):xss) = "\t<td>" ++ x ++ "</td>\n</tr>\n<tr>\n" ++ constructHTMLRaw     xss
-        constructHTMLRaw ((x:xs):xss) = "\t<td>" ++ x ++ "</td>\n"              ++ constructHTMLRaw (xs:xss)
+  "<table class=\"table table-bordered table-striped\">\n<tr>\n" ++ (constructHTMLRaw headCell $ take 1 csved) ++ (constructHTMLRaw cell $ tail csved) ++ "</table>"
+  where csved :: CSV
+        csved = csv csvLength body
+
+        headCell :: String -> String
+        headCell s = "<td><h4 class=\"text-center\">" ++ s ++ "</h4></td>"
+
+        cell :: String -> String
+        cell s = "<td><h5 class=\"text-center\">" ++ s ++ "</h5></td>"
+
+        constructHTMLRaw :: (String -> String) -> CSV -> String
+        constructHTMLRaw cfn []           = ""
+        constructHTMLRaw cfn ((x:[]):xss) = "\t" ++ cfn x ++ "\n</tr>\n<tr>\n" ++ constructHTMLRaw cfn    xss
+        constructHTMLRaw cfn ((x:xs):xss) = "\t" ++ cfn x ++ "\n"              ++ constructHTMLRaw cfn (xs:xss)
 
 -- Getting the response body and code
 -- for a given url
