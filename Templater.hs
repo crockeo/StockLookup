@@ -58,7 +58,7 @@ page ps fp = do
   return $ header ++ (fixIndentation page) ++ footer
   where fixIndentation :: String -> String
         fixIndentation s =
-          unlines $ map (\l -> "\t\t" ++ l) $ lines s
+          unlines $ map (\l -> "\t\t\t" ++ l) $ lines s
 
 -- Packing the page function into
 -- a ByteString
